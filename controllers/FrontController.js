@@ -2,6 +2,7 @@ const UserModel = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
+const CourseModel = require("../models/course");
 
 cloudinary.config({
   cloud_name: "dm72e144k",
@@ -23,8 +24,8 @@ class FrontController {
 
   static about = async (req, res) => {
     try {
-      const { name,image } = req.userdata;
-      res.render("about", { n: name , i: image});
+      const { name, image } = req.userdata;
+      res.render("about", { n: name, i: image });
     } catch (error) {
       console.log(error);
     }
@@ -40,9 +41,20 @@ class FrontController {
 
   static dashboard = async (req, res) => {
     try {
-      const { name,image } = req.userdata;
+      const { name, image, email, id } = req.userdata;
       // console.log(name);
-      res.render("dashboard", { n: name , i: image });
+      const btech = await CourseModel.findOne({ user_id: id, course: "btech" });
+      const bca = await CourseModel.findOne({ user_id: id, course: "bca" });
+      const mca = await CourseModel.findOne({ user_id: id, course: "mca" });
+      res.render("dashboard", {
+        n: name,
+        i: image,
+        e: email,
+        btech: btech,
+        bca: bca,
+        mca: mca,
+      });
+      // console.log(btech);
     } catch (error) {
       console.log(error);
     }
@@ -51,6 +63,89 @@ class FrontController {
   static team = async (req, res) => {
     try {
       res.render("team");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  static profile = async (req, res) => {
+    try {
+      const { name, image, email } = req.userdata;
+
+      res.render("profile", { n: name, i: image, e: email });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  static updateProfile = async (req, res) => {
+    try {
+      const { id } = req.userdata;
+      const { name, image, email } = req.body;
+      if (req.files) {
+        const user = await UserModel.findById(id);
+        const imageID = user.image.public_id;
+
+        await cloudinary.uploader.destroy(imageID);
+        const imagefile = req.files.image;
+        const imageupload = await cloudinary.uploader.upload(
+          imagefile.tempFilePath,
+          {
+            folder: "profileImage",
+          }
+        );
+
+        var data = {
+          name: name,
+          email: email,
+
+          image: {
+            public_id: imageupload.public_id,
+            url: imageupload.secure_url,
+          },
+        };
+      } else {
+        var data = {
+          name: name,
+          email: email,
+        };
+      }
+      await UserModel.findByIdAndUpdate(id, data);
+      req.flash("success", "update profile successfully");
+      res.redirect("/profile");
+
+      // console.log(req.body);
+      // console.log(req.files.image);
+    } catch (error) {}
+  };
+
+  static changepassword = async (req, res) => {
+    try {
+      const { op, np, cp } = req.body;
+      const { id } = req.userdata;
+      if (op && np && cp) {
+        const user = await UserModel.findById(id);
+        const isMatched = await bcrypt.compare(op, user.password);
+        console.log(isMatched);
+        if (!isMatched) {
+          req.flash("error", "current password is incorrect");
+          res.redirect("/profile");
+        } else {
+          if (np != cp) {
+            req.flash("error", "password does not match");
+            res.redirect("/profile");
+          } else {
+            const newHashPassword = await bcrypt.hash(np, 10);
+            await UserModel.findByIdAndUpdate(id, {
+              password: newHashPassword,
+            });
+            req.flash("success", "password updated successfully");
+            res.redirect("/");
+          }
+        }
+      } else {
+        req.flash("error", "all fields are required");
+        res.redirect("/profile");
+      }
     } catch (error) {
       console.log(error);
     }
@@ -66,7 +161,7 @@ class FrontController {
 
   static contact = async (req, res) => {
     try {
-      const { name,image } = req.userdata;
+      const { name, image } = req.userdata;
       res.render("contact", { n: name, i: image });
     } catch (error) {
       console.log(error);
@@ -132,13 +227,23 @@ class FrontController {
         if (user != null) {
           const isMatched = await bcrypt.compare(p, user.password);
           if (isMatched) {
+
+            if (user.role == 'admin'){
+
+              let token = jwt.sign({ ID: user.id }, "pninfosys8589578958ty");
+              // console.log(token);
+              res.cookie("token", token);
+  
+              res.redirect("/admin/dashboard");
+
+            } else{
+              let token = jwt.sign({ ID: user.id }, "pninfosys8589578958ty");
+              res.cookie("token", token);
+              res.redirect("/dashboard");
+            }
             // token
 
-            let token = jwt.sign({ ID: user.id }, "pninfosys8589578958ty");
-            // console.log(token);
-            res.cookie("token", token);
-
-            res.redirect("/dashboard");
+           
           } else {
             req.flash("error", "Email or Password is not valid");
             res.redirect("/");

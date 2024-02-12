@@ -14,7 +14,7 @@ const Courseschema = new mongoose.Schema(
             type: Number,
             Required: true,
         },
-        dateofbirth: {
+        dob: {
             type: String,
             Required: true,
         },
@@ -33,6 +33,11 @@ const Courseschema = new mongoose.Schema(
         course: {
             type: String,
             Required: "course",
+        },
+
+        user_id:{
+            type: String,
+            Required: true,
         },
         //image:{...
         //},

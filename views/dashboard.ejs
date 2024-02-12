@@ -136,7 +136,19 @@
               <p class="card-text">
                 B.Tech is a professional undergraduate engineering degree
               </p>
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#btech" >Register</button>
+              <%if(btech){%>
+              <a class="btn btn-info" href="/course_display">Course Display</a>
+              <%}else{%>
+              <button
+                type="button"
+                class="btn btn-info"
+                data-bs-toggle="modal"
+                data-bs-target="#btech"
+              >
+                Register
+              </button>
+
+                         <%}%>
             </div>
           </div>
         </div>
@@ -155,7 +167,19 @@
               <p class="card-text">
                 BCA is a three-year Bachelor's Degree in Computer Application
               </p>
-              <button type="button" class="btn text-light">Register</button>
+              <%if(bca){%>
+              <a class="btn btn-info" href="/course_display">Course Display</a>
+              <%}else{%>
+              <button
+                type="button"
+                class="btn btn-info"
+                data-bs-toggle="modal"
+                data-bs-target="#btech"
+              >
+                Register
+              </button>
+
+                         <%}%>
             </div>
           </div>
         </div>
@@ -175,7 +199,19 @@
                 MCA is a professional post-graduation degree in Computer
                 Application
               </p>
-              <button type="button" class="btn text-light">Register</button>
+              <%if(mca){%>
+              <a class="btn btn-info" href="/course_display">Course Display</a>
+              <%}else{%>
+              <button
+                type="button"
+                class="btn btn-info"
+                data-bs-toggle="modal"
+                data-bs-target="#btech"
+              >
+                Register
+              </button>
+
+                         <%}%>
             </div>
           </div>
         </div>
@@ -207,11 +243,21 @@
         <form action="/courseinsert" method="post">
           <div class="mb-3">
             <label>Name</label>
-            <input type="text" name="name" class="form-control" />
+            <input
+              type="text"
+              name="name"
+              value="<%= n %>"
+              class="form-control"
+            />
           </div>
           <div class="mb-3">
             <label>Email</label>
-            <input type="text" name="email" class="form-control" />
+            <input
+              type="text"
+              name="email"
+              value="<%= e %>"
+              class="form-control"
+            />
           </div>
           <div class="mb-3">
             <label>Phone No</label>
