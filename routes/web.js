@@ -32,6 +32,11 @@ route.post("/updateProfile", checkUserAuth, FrontController.updateProfile);
 route.post("/changepassword",checkUserAuth,FrontController.changepassword)
 
 // ADMINCONTROLLER
+
 route.get("/admin/dashboard",checkUserAuth,AdminController.dashboard)
+route.post("/admin/update_status/:id",checkUserAuth,AdminController.update_status)
+route.get('/forget',FrontController.forgetload)
+route.post('/forget',FrontController.forgetverify)
+
 
 module.exports = route;

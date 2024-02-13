@@ -1,0 +1,14 @@
+<center>FORGET PASSWORD</center>
+
+<% if(typeof message !== 'undefined'){ %>
+<h4><%=message %></h4>
+<% } %>
+
+<form action="/forget" method="post">
+ <center> <input type="email" placeholder="enter email" required name="email" /></center>
+  <br><br>
+ <center> <input type="submit" value="Send Reset Link"></center>
+</form>
+
+
+</center>

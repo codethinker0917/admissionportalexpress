@@ -26,6 +26,11 @@ const Userschema = new mongoose.Schema(
         type: String,
         Required: true,
       },
+
+      token:{
+          type:String,
+          default:''  
+      },
       url: {
         type: String,
         Required: true,

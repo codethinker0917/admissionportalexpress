@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
 const CourseModel = require("../models/course");
+const randomstring = require("randomstring");
 
 cloudinary.config({
   cloud_name: "dm72e144k",
@@ -227,23 +228,18 @@ class FrontController {
         if (user != null) {
           const isMatched = await bcrypt.compare(p, user.password);
           if (isMatched) {
-
-            if (user.role == 'admin'){
-
+            if (user.role == "admin") {
               let token = jwt.sign({ ID: user.id }, "pninfosys8589578958ty");
               // console.log(token);
               res.cookie("token", token);
-  
-              res.redirect("/admin/dashboard");
 
-            } else{
+              res.redirect("/admin/dashboard");
+            } else {
               let token = jwt.sign({ ID: user.id }, "pninfosys8589578958ty");
               res.cookie("token", token);
               res.redirect("/dashboard");
             }
             // token
-
-           
           } else {
             req.flash("error", "Email or Password is not valid");
             res.redirect("/");
@@ -265,6 +261,34 @@ class FrontController {
     try {
       res.clearCookie("token");
       res.redirect("/");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // forget password code start
+
+  static forgetload = async (req, res) => {
+    try {
+      res.render("forget");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  static forgetverify = async (req, res) => {
+    try {
+      const email = req.body.email;
+      const userdata = await UserModel.findOne({ email: email });
+      if (userdata) {
+        if (userdata.is_varified == 0) {
+          res.render("forget", { message: "please verify your mail." });
+        } else {
+          const randomstring = randomstring.generate();
+        }
+      } else {
+        res.render("forget", { message: "user email is incorrect." });
+      }
     } catch (error) {
       console.log(error);
     }
